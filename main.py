@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
 # ─────────────────────────────────────────────
@@ -144,9 +145,57 @@ insight_box("graph2", default="")
 st.divider()
 
 # ═════════════════════════════════════════════
-# 구역 3. (다음 그래프가 들어갈 자리)
+# 구역 3. 날짜별 10위권 일관객 합계 (영역 그래프)
 # ═════════════════════════════════════════════
-# st.header("3. 제목")
+st.header("3. 날짜별 10위권 일관객 합계")
+
+# 날짜별로 그날 10위권 일관객을 모두 더하기
+daily = df.groupby("날짜", as_index=False)["일관객"].sum()
+
+# 합계가 가장 컸던 3일 (표시할 때 겹치지 않게 날짜순으로 정렬)
+top3_days = daily.nlargest(3, "일관객").sort_values("날짜")
+
+fig3 = px.area(
+    daily,
+    x="날짜",
+    y="일관객",
+    title="하루 10위권 일관객 합계",
+    color_discrete_sequence=[WARM_ORANGE],
+)
+fig3.update_traces(
+    hovertemplate="날짜: %{x|%Y-%m-%d}<br>10위권 합계: %{y:,}명<extra></extra>"
+)
+
+# 가장 컸던 3일을 점과 날짜 글자로 표시 (글자 위치를 달리해 서로 안 겹치게 함)
+fig3.add_trace(
+    go.Scatter(
+        x=top3_days["날짜"],
+        y=top3_days["일관객"],
+        mode="markers+text",
+        text=[f"{d:%Y-%m-%d}" for d in top3_days["날짜"]],
+        textposition=["top center", "top left", "top right"],
+        marker=dict(size=11, color="#C0392B", line=dict(width=2, color="white")),
+        hovertemplate="날짜: %{x|%Y-%m-%d}<br>10위권 합계: %{y:,}명<extra>합계 TOP 3</extra>",
+        name="합계 TOP 3",
+        showlegend=False,
+    )
+)
+fig3.update_layout(
+    xaxis_title="날짜",
+    yaxis_title="10위권 일관객 합계(명)",
+    yaxis_range=[0, daily["일관객"].max() * 1.15],  # 글자가 잘리지 않게 위쪽 여백
+    plot_bgcolor="white",
+)
+st.plotly_chart(fig3, use_container_width=True)
+
+insight_box("graph3", default="")
+
+st.divider()
+
+# ═════════════════════════════════════════════
+# 구역 4. (다음 그래프가 들어갈 자리)
+# ═════════════════════════════════════════════
+# st.header("4. 제목")
 # ... 그래프 코드 ...
-# insight_box("graph3")
+# insight_box("graph4")
 # st.divider()
