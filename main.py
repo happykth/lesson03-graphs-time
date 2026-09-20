@@ -233,9 +233,49 @@ insight_box("graph4", default="")
 st.divider()
 
 # ═════════════════════════════════════════════
-# 구역 5. (다음 그래프가 들어갈 자리)
+# 구역 5. 월 × 요일별 일관객 합계 (히트맵)
 # ═════════════════════════════════════════════
-# st.header("5. 제목")
+st.header("5. 월 × 요일별 일관객 합계")
+
+WEEKDAYS = ["월", "화", "수", "목", "금", "토", "일"]  # 월요일부터 일요일 순서
+
+heat = df.copy()
+# 2025-09와 2026-09가 섞이지 않도록 '연-월'로 뽑기
+heat["월"] = heat["날짜"].dt.strftime("%Y-%m")
+heat["요일"] = heat["날짜"].dt.dayofweek.map(dict(enumerate(WEEKDAYS)))  # 0=월 ... 6=일
+
+pivot = (
+    heat.pivot_table(index="월", columns="요일", values="일관객", aggfunc="sum")
+    .reindex(columns=WEEKDAYS)  # 열 순서를 월~일로 고정
+    .sort_index()  # 행은 시간 순서
+)
+
+fig5 = px.imshow(
+    pivot,
+    aspect="auto",
+    color_continuous_scale="Oranges",  # 진할수록 관객이 많음
+    title="월 × 요일별 일관객 합계",
+)
+fig5.update_traces(
+    hovertemplate="%{y} %{x}요일<br>일관객 합계: %{z:,}명<extra></extra>"
+)
+fig5.update_layout(
+    xaxis_title="요일",
+    yaxis_title="월",
+    xaxis=dict(side="top"),
+    coloraxis_colorbar=dict(title="일관객(명)"),
+    plot_bgcolor="white",
+)
+st.plotly_chart(fig5, use_container_width=True)
+
+insight_box("graph5", default="")
+
+st.divider()
+
+# ═════════════════════════════════════════════
+# 구역 6. (다음 그래프가 들어갈 자리)
+# ═════════════════════════════════════════════
+# st.header("6. 제목")
 # ... 그래프 코드 ...
-# insight_box("graph5")
+# insight_box("graph6")
 # st.divider()
