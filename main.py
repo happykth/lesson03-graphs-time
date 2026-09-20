@@ -46,6 +46,25 @@ df = load_data()
 
 
 # ─────────────────────────────────────────────
+# '이 그래프로 알 수 있는 것' 입력칸 + 표시 상자
+# 그래프마다 insight_box("고유이름") 한 줄만 부르면 돼요.
+# default에 문장을 적어 두면 앱을 다시 열어도 그 문장이 기본으로 보여요.
+# ─────────────────────────────────────────────
+def insight_box(key: str, default: str = ""):
+    text = st.text_input(
+        "✏️ 이 그래프로 알 수 있는 것 (한 문장)",
+        value=default,
+        key=f"insight_{key}",
+        placeholder="여기에 클릭해서 한 문장을 적고 Enter를 눌러 주세요",
+    )
+    if text.strip():
+        st.markdown(
+            f"<div class='insight'>💡 <b>이 그래프로 알 수 있는 것</b><br>{text}</div>",
+            unsafe_allow_html=True,
+        )
+
+
+# ─────────────────────────────────────────────
 # 제목
 # ─────────────────────────────────────────────
 st.title("🎬 영화 데이터 그래프 도감 1 - 시간")
@@ -86,12 +105,7 @@ fig1.update_layout(
 )
 st.plotly_chart(fig1, use_container_width=True)
 
-# 👇 이 그래프로 알 수 있는 것 (문구를 아래 따옴표 안에 직접 적어 주세요)
-GRAPH1_INSIGHT = ""
-st.markdown(
-    f"<div class='insight'>💡 <b>이 그래프로 알 수 있는 것</b><br>{GRAPH1_INSIGHT or '(여기에 한 문장을 적어 주세요)'}</div>",
-    unsafe_allow_html=True,
-)
+insight_box("graph1", default="")
 
 st.divider()
 
@@ -100,6 +114,5 @@ st.divider()
 # ═════════════════════════════════════════════
 # st.header("2. 제목")
 # ... 그래프 코드 ...
-# GRAPH2_INSIGHT = ""
-# st.markdown(f"<div class='insight'>💡 <b>이 그래프로 알 수 있는 것</b><br>{GRAPH2_INSIGHT}</div>", unsafe_allow_html=True)
+# insight_box("graph2")
 # st.divider()
