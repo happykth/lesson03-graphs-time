@@ -193,9 +193,49 @@ insight_box("graph3", default="")
 st.divider()
 
 # ═════════════════════════════════════════════
-# 구역 4. (다음 그래프가 들어갈 자리)
+# 구역 4. 영화별 일관객 합계 TOP 10 (가로 막대그래프)
 # ═════════════════════════════════════════════
-# st.header("4. 제목")
+st.header("4. 영화별 일관객 합계 TOP 10")
+
+# 영화별로 일관객 합계와, 10위권에 든 날수(= 그 영화가 나온 행의 개수) 구하기
+movie_sum = (
+    df.groupby("영화명")
+    .agg(일관객합계=("일관객", "sum"), 십위권날수=("날짜", "count"))
+    .reset_index()
+    .nlargest(10, "일관객합계")
+)
+
+fig4 = px.bar(
+    movie_sum,
+    x="일관객합계",
+    y="영화명",
+    orientation="h",
+    custom_data=["십위권날수"],
+    title="이 기간 일관객 합계 TOP 10",
+    color_discrete_sequence=[WARM_ORANGE],
+)
+fig4.update_traces(
+    hovertemplate=(
+        "%{y}<br>일관객 합계: %{x:,}명"
+        "<br>10위권에 든 날수: %{customdata[0]}일<extra></extra>"
+    )
+)
+fig4.update_layout(
+    xaxis_title="일관객 합계(명)",
+    yaxis_title="",
+    yaxis=dict(categoryorder="total ascending"),  # 관객이 많은 영화가 위로
+    plot_bgcolor="white",
+)
+st.plotly_chart(fig4, use_container_width=True)
+
+insight_box("graph4", default="")
+
+st.divider()
+
+# ═════════════════════════════════════════════
+# 구역 5. (다음 그래프가 들어갈 자리)
+# ═════════════════════════════════════════════
+# st.header("5. 제목")
 # ... 그래프 코드 ...
-# insight_box("graph4")
+# insight_box("graph5")
 # st.divider()
